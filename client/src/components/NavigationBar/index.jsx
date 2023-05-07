@@ -28,9 +28,9 @@ const NavigationBar = () => {
             }`}
           >
             {navItems.map((nav) => (
-              <li className="md:ml-8  md:my-0 my-7" key={nav.name}>
+              <li className="md:ml-8 md:my-0 my-7" key={nav.name}>
                 <Link
-                  className="no-underline cursor-pointer text-white hover:text-red-400 duration-300 text-current"
+                  className="text-slate-50 hover:text-red-300 no-underline cursor-pointer duration-300"
                   to={`/${nav.name.toLowerCase()}`}
                 >
                   {nav.name}
