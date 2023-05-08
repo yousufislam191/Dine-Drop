@@ -1,11 +1,12 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavigationBar from "../components/NavigationBar";
-import Home from "../components/pages/Home";
-import Services from "../components/pages/Services";
-import About from "../components/pages/About";
-import Contact from "../components/pages/Contact";
-import NotFoundPage from "../components/pages/NotFoundPage";
+import Home from "../pages/Home";
+import Services from "../pages/Services";
+import About from "../pages/About";
+import Contact from "../pages/Contact";
+import NotFoundPage from "../pages/NotFoundPage";
+import Dashboard from "../pages/Dashboard";
 
 const RouterPath = () => {
   return (
@@ -18,6 +19,7 @@ const RouterPath = () => {
           <Route exact path="/services" element={<Services />} />
           <Route exact path="/about" element={<About />} />
           <Route exact path="/contact" element={<Contact />} />
+          <Route exact path="/dashboard" element={<Dashboard />} />
           <Route exact path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

@@ -7,8 +7,9 @@ const NavigationBar = () => {
   let [open, setOpen] = useState(false);
   return (
     <>
-      <div className="shadow-md w-full fixed top-0 left-0">
+      <div className="shadow-md w-full  top-0 left-0">
         <div className="md:flex items-center justify-between bg-[#1B3358] py-2 md:px-10 px-7">
+          {/* fixed*/}
           <div className="font-bold text-2xl cursor-pointer flex items-center font-[Poppins] text-gray-800">
             <span className="text-3xl text-[#F1916D] mr-1">DINE DROP</span>
           </div>
