@@ -1,14 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 require("./config/db");
 
 const userRouter = require("./routes/user.routes");
 
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://127.0.0.1:5173/" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use("/api/user", userRouter);
 
