@@ -92,7 +92,7 @@ const userSignInController = async (req, res) => {
   if (!existingUser) {
     return res
       .status(400)
-      .json({ message: "User not found!!.. Regester please" });
+      .json({ message: "User not found!!.. Signup please" });
   } else {
     const isPasswordMatches = await bcrypt.compareSync(
       password,
@@ -111,9 +111,9 @@ const userSignInController = async (req, res) => {
       );
       // console.log("Generated token\n", token);
 
-      // if (req.cookies[`${existingUser._id}`]) {
-      //   req.cookies[`${existingUser._id}`] = "";
-      // }
+      if (req.cookies[`${existingUser._id}`]) {
+        req.cookies[`${existingUser._id}`] = "";
+      }
 
       res.cookie(String(existingUser._id), token, {
         path: "/",
@@ -131,7 +131,7 @@ const userSignInController = async (req, res) => {
 // when user login then firstly verify token then redirect
 const verifyToken = (req, res, next) => {
   const cookies = req.headers.cookie;
-  const token = cookies.split("=")[1];
+  const token = cookies.split("=")[2];
   // console.log(token);
   if (!token) {
     return res.status(400).json({ message: "Token not found" });
@@ -164,7 +164,7 @@ const getUser = async (req, res) => {
 // refresh token and generate new token
 const refreshToken = (req, res, next) => {
   const cookies = req.headers.cookie;
-  const previousToken = cookies.split("=")[1];
+  const previousToken = cookies.split("=")[2];
 
   if (!previousToken) {
     return res.status(400).json({ message: "Token not found" });
