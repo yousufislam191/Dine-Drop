@@ -67,4 +67,22 @@ const signUpValidator = [
     .withMessage("Role must be digits"),
 ];
 
-module.exports = { signUpValidator };
+const signInValidator = [
+  check("email")
+    .trim()
+    .normalizeEmail()
+    .notEmpty()
+    .withMessage("Email is missing")
+    .isEmail()
+    .withMessage("Invalid email address")
+    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+    .withMessage("Invalid email address"),
+  check("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is missing")
+    .isLength({ min: 8 })
+    .withMessage("Invalid password"),
+];
+
+module.exports = { signUpValidator, signInValidator };
