@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 
 const User = require("../models/users.model");
@@ -131,7 +131,7 @@ const userSignInController = async (req, res) => {
 // when user login then firstly verify token then redirect
 const verifyToken = (req, res, next) => {
   const cookies = req.headers.cookie;
-  const token = cookies.split("=")[2];
+  const token = cookies.split("=")[1];
   // console.log(token);
   if (!token) {
     return res.status(400).json({ message: "Token not found" });
