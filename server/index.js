@@ -1,8 +1,8 @@
-require("dotenv").config();
 const app = require("./app");
-const config = require("./config/config");
-const PORT = config.app.port;
+const connectDB = require("./config/db");
+const { serverPort } = require("./secret");
 
-app.listen(PORT, () => {
-  console.log(`Server is listening port http://localhost:${PORT}`);
+app.listen(serverPort, async () => {
+  console.log(`Server is listening port http://localhost:${serverPort}`);
+  await connectDB();
 });

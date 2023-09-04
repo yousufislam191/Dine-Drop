@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
-const config = require("./config");
+const { mongodbUrl } = require("../secret");
 
-const dbURL = config.db.url;
+const connectDB = async (options = {}) => {
+  try {
+    await mongoose.connect(mongodbUrl, options);
+    console.log("Database connection established successfully");
 
-mongoose
-  .connect(dbURL)
-  .then(() => {
-    console.log("mongodb atles is connected");
-  })
-  .catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+    mongoose.connection.on("error", (err) =>
+      console.error("Database connection error: ", err)
+    );
+  } catch (error) {
+    console.error("Could not connect to Database: ", error.toString());
+  }
+};
+module.exports = connectDB;
