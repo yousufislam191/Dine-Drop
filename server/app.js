@@ -9,6 +9,7 @@ const app = express();
 
 require("./config/db");
 const userRouter = require("./routes/user.routes");
+const seedRouter = require("./routes/seed.routes");
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
@@ -25,6 +26,7 @@ app.use(xssClean());
 app.use(limiter);
 
 app.use("/api/user", userRouter);
+app.use("/api/seeduser", seedRouter);
 
 // app.get("/", (req, res) => {
 //   res.status(200).send("server home route");

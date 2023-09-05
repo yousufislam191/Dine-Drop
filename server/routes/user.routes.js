@@ -9,17 +9,17 @@ const {
 const { validationHandler } = require("../middleware");
 const { signUpValidator, signInValidator } = require("../middleware/userAuth");
 
-const router = require("express").Router();
+const userRouter = require("express").Router();
 
-router.post("/register", signUpValidator, validationHandler, createNewUser);
-router.get("/email-activate", activateCreatedUser);
-router.post(
+userRouter.post("/register", signUpValidator, validationHandler, createNewUser);
+userRouter.get("/email-activate", activateCreatedUser);
+userRouter.post(
   "/signin",
   signInValidator,
   validationHandler,
   userSignInController
 );
-router.get("/fetch-user", verifyToken, getUser);
-router.get("/refresh", refreshToken, verifyToken, getUser);
+userRouter.get("/fetch-user", verifyToken, getUser);
+userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
-module.exports = router;
+module.exports = userRouter;
