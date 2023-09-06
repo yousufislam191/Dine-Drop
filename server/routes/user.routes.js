@@ -5,6 +5,7 @@ const {
   verifyToken,
   getUser,
   refreshToken,
+  getUserById,
 } = require("../controllers/user.controllers");
 const { validationHandler } = require("../middleware");
 const { signUpValidator, signInValidator } = require("../middleware/userAuth");
@@ -23,5 +24,6 @@ userRouter.get("/fetch-user", verifyToken, getUser);
 userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
 userRouter.get("/", getUser);
+userRouter.get("/:id", getUserById);
 
 module.exports = userRouter;

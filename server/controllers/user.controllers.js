@@ -5,6 +5,7 @@ const User = require("../models/users.model");
 const sendEmail = require("./sendEmail.controllers");
 const emailMessage = require("../models/mail.models");
 const { successResponse } = require("./response.controller");
+const { findUserById } = require("../services/findUserById");
 
 const getUser = async (req, res, next) => {
   try {
@@ -47,6 +48,21 @@ const getUser = async (req, res, next) => {
           nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
         },
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET user by ID
+const getUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const user = await findUserById(id);
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User were retured successfully",
+      payload: { user },
     });
   } catch (error) {
     next(error);
@@ -249,6 +265,7 @@ module.exports = {
   activateCreatedUser,
   userSignInController,
   verifyToken,
-  getUser,
   refreshToken,
+  getUser,
+  getUserById,
 };
