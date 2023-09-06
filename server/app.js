@@ -10,6 +10,7 @@ const app = express();
 require("./config/db");
 const userRouter = require("./routes/user.routes");
 const seedRouter = require("./routes/seed.routes");
+const { errorResponse } = require("./controllers/response.controller");
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
@@ -39,8 +40,8 @@ app.use((req, res, next) => {
 
 // server error handling --> all errors handeled finally
 app.use((err, req, res, next) => {
-  return res.status(err.status || 500).json({
-    success: false,
+  return errorResponse(res, {
+    statusCode: err.status,
     message: err.message,
   });
   // if (res.headersSent) {
