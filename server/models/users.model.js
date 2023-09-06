@@ -28,7 +28,7 @@ const userSchema = new Schema(
       set: (v) => bcrypt.hashSync(v, bcrypt.genSaltSync(10)),
     },
     phone: {
-      type: Number,
+      type: String,
       required: [true, "Phone number is required"],
       minLength: [11, "Phone number must be a valid number"],
       maxLength: [11, "Phone number must be a valid number"],
