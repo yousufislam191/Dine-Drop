@@ -4,6 +4,7 @@ const JWT = require("jsonwebtoken");
 const User = require("../models/users.model");
 const sendEmail = require("./sendEmail.controllers");
 const emailMessage = require("../models/mail.models");
+const { successResponse } = require("./response.controller");
 
 const getUser = async (req, res, next) => {
   try {
@@ -34,14 +35,17 @@ const getUser = async (req, res, next) => {
 
     if (!users) throw createError(404, "User not found");
 
-    res.status(200).send({
+    return successResponse(res, {
+      statusCode: 200,
       message: "Users were retured successfully",
-      users,
-      pagination: {
-        totalPages: Math.ceil(count / limit),
-        currentPage: page,
-        previousPage: page - 1 > 0 ? page - 1 : null,
-        nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
+      payload: {
+        users,
+        pagination: {
+          totalPages: Math.ceil(count / limit),
+          currentPage: page,
+          previousPage: page - 1 > 0 ? page - 1 : null,
+          nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
+        },
       },
     });
   } catch (error) {
