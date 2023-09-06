@@ -22,4 +22,6 @@ userRouter.post(
 userRouter.get("/fetch-user", verifyToken, getUser);
 userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
+userRouter.get("/", getUser);
+
 module.exports = userRouter;

@@ -1,9 +1,53 @@
-// const bcrypt = require("bcryptjs");
+const createError = require("http-errors");
 const JWT = require("jsonwebtoken");
 
 const User = require("../models/users.model");
 const sendEmail = require("./sendEmail.controllers");
 const emailMessage = require("../models/mail.models");
+
+const getUser = async (req, res, next) => {
+  try {
+    const search = req.query.search || "";
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 5;
+
+    const searchRegExp = new RegExp(".*" + search + ".*", "i");
+
+    const filter = {
+      role: { $ne: 1 }, //if role = 1 that means it is admin, so it will not be able to retun
+      $or: [
+        { name: { $regex: searchRegExp } },
+        { email: { $regex: searchRegExp } },
+        { phone: { $regex: searchRegExp } },
+      ],
+    };
+
+    // which we don't want to return for get request
+    const options = { password: 0 };
+
+    const users = await User.find(filter, options)
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    // total documents count
+    const count = await User.find(filter).countDocuments();
+
+    if (!users) throw createError(404, "User not found");
+
+    res.status(200).send({
+      message: "Users were retured successfully",
+      users,
+      pagination: {
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
+        previousPage: page - 1 > 0 ? page - 1 : null,
+        nextPage: page + 1 <= Math.ceil(count / limit) ? page + 1 : null,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // for create new user and send email activation notification
 const createNewUser = async (req, res) => {
@@ -146,20 +190,20 @@ const verifyToken = (req, res, next) => {
   next();
 };
 
-const getUser = async (req, res) => {
-  const userId = req.id;
-  let user;
-  try {
-    user = await User.findById(userId, "-password");
-  } catch (error) {
-    // res.status(500).send(error.message);
-    return new Error(error);
-  }
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-  return res.status(200).json({ user });
-};
+// const getUser = async (req, res) => {
+//   const userId = req.id;
+//   let user;
+//   try {
+//     user = await User.findById(userId, "-password");
+//   } catch (error) {
+//     // res.status(500).send(error.message);
+//     return new Error(error);
+//   }
+//   if (!user) {
+//     return res.status(404).json({ message: "User not found" });
+//   }
+//   return res.status(200).json({ user });
+// };
 
 // refresh token and generate new token
 const refreshToken = (req, res, next) => {
