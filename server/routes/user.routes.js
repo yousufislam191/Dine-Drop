@@ -6,6 +6,7 @@ const {
   getUser,
   refreshToken,
   getUserById,
+  deleteUserById,
 } = require("../controllers/user.controllers");
 const { validationHandler } = require("../middleware");
 const { signUpValidator, signInValidator } = require("../middleware/userAuth");
@@ -25,5 +26,6 @@ userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
 userRouter.get("/", getUser);
 userRouter.get("/:id", getUserById);
+userRouter.delete("/:id", deleteUserById);
 
 module.exports = userRouter;

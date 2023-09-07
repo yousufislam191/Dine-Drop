@@ -1,11 +1,12 @@
 const createError = require("http-errors");
 const JWT = require("jsonwebtoken");
+const fs = require("fs");
 
 const User = require("../models/users.model");
 const sendEmail = require("./sendEmail.controllers");
 const emailMessage = require("../models/mail.models");
 const { successResponse } = require("./response.controller");
-const { findUserById } = require("../services/findUserById");
+const { findWithId } = require("../services/findWithId");
 
 const getUser = async (req, res, next) => {
   try {
@@ -58,11 +59,51 @@ const getUser = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const user = await findUserById(id);
+    const options = { password: 0 };
+    const user = await findWithId(User, id, options);
     return successResponse(res, {
       statusCode: 200,
-      message: "User were retured successfully",
+      message: "User was retured successfully",
       payload: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE user
+const deleteUserById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const options = { password: 0 };
+    const user = await findWithId(User, id, options);
+
+    // user image deleted
+    const userImagePath = user.image;
+    fs.access(userImagePath, (err) => {
+      if (err) {
+        console.log("user image does not exist");
+      } else {
+        fs.unlink(userImagePath, (err) => {
+          if (err) throw err;
+          console.log("user image was deleted successfully");
+        });
+      }
+    });
+
+    const deleteUser = await User.findOneAndDelete({
+      _id: id,
+      role: { $ne: 1 },
+    });
+    if (!deleteUser)
+      throw createError(
+        404,
+        "This user will never be deleted. Before being deleted, you have to make another user an admin."
+      );
+    return successResponse(res, {
+      statusCode: 200,
+      message: "User was deleted successfully",
     });
   } catch (error) {
     next(error);
@@ -268,4 +309,5 @@ module.exports = {
   refreshToken,
   getUser,
   getUserById,
+  deleteUserById,
 };
