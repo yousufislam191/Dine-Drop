@@ -1,13 +1,20 @@
 const createError = require("http-errors");
 const JWT = require("jsonwebtoken");
-const fs = require("fs");
 
 const User = require("../models/users.model");
-const sendEmail = require("./sendEmail.controllers");
-const emailMessage = require("../models/mail.models");
 const { successResponse } = require("./response.controller");
 const { findWithId } = require("../services/findWithId");
+const { deleteImage } = require("../helper/deleteImage");
+const { createJWT } = require("../helper/createJWT");
+const {
+  jwtActivationKey,
+  clientURL,
+  appName,
+  expireJwtForActivateAccount,
+} = require("../secret");
+const sendEmailWithNodamailer = require("../helper/email");
 
+// GET all user by admin
 const getUser = async (req, res, next) => {
   try {
     const search = req.query.search || "";
@@ -81,16 +88,7 @@ const deleteUserById = async (req, res, next) => {
 
     // user image deleted
     const userImagePath = user.image;
-    fs.access(userImagePath, (err) => {
-      if (err) {
-        console.log("user image does not exist");
-      } else {
-        fs.unlink(userImagePath, (err) => {
-          if (err) throw err;
-          console.log("user image was deleted successfully");
-        });
-      }
-    });
+    deleteImage(userImagePath);
 
     const deleteUser = await User.findOneAndDelete({
       _id: id,
@@ -111,35 +109,85 @@ const deleteUserById = async (req, res, next) => {
 };
 
 // for create new user and send email activation notification
-const createNewUser = async (req, res) => {
-  const { name, email, password, phone, address, role } = req.body;
-
-  const token = JWT.sign(
-    { name, email, password, phone, address, role },
-    process.env.USER_ACCOUNT_ACTIVATE_KEY,
-    { expiresIn: "5m" }
-  );
-
+const createNewUser = async (req, res, next) => {
   try {
-    const info = await sendEmail(emailMessage(email, token));
-    // console.log(`"Accepted message: " ${info.accepted}`);
-    if (info.accepted) {
-      return res.status(200).send({
-        message: `A verification email has been sent to this email ${email} .
-        Verification email will be expire after 5 Minutes.`,
-        token: token,
+    const { name, email, password, phone, address } = req.body;
+
+    const userExists = await User.exists({ email: email });
+    if (userExists) {
+      throw createError(409, "User already exists. Please sign in");
+    }
+
+    // create token
+    const token = createJWT(
+      { name, email, password, phone, address },
+      jwtActivationKey,
+      expireJwtForActivateAccount
+    );
+
+    //prepare email
+    const emailData = {
+      email,
+      subject: `Activate your ${appName} Account`, // Subject line
+      text: "Verify your account", // plain text body
+      html: `
+    <h2>Hello ${name}</h2>
+    <h3>Thanks for registering ${appName} account</h3>
+    <h4>Please click here to <a href="${clientURL}/api/activate/${token}" target="_blank">activate your account</a>. The Link will be expire after ${expireJwtForActivateAccount}.</h4>
+    `, // html body
+    };
+
+    // send activation email
+    try {
+      await sendEmailWithNodamailer(emailData);
+    } catch (error) {
+      next(createError(500, "Failed to send verification email"));
+      return;
+    }
+
+    return successResponse(res, {
+      statusCode: 200,
+      message: `A verification email has been sent to this email ${email}. Please go to your email to complete your registration process.`,
+      payload: { token },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// for activate user account
+const activateUserAccount = async (req, res, next) => {
+  try {
+    const token = req.body.token;
+    if (!token) throw createError(404, "Token not found");
+
+    try {
+      const decodedToken = JWT.verify(token, jwtActivationKey);
+      if (!decodedToken)
+        throw createError(401, "Unable to verify user account");
+
+      const userExists = await User.exists({ email: decodedToken.email });
+      if (userExists) {
+        throw createError(409, "User already exists. Please sign in");
+      }
+
+      await User.create(decodedToken);
+
+      return successResponse(res, {
+        statusCode: 201,
+        message: "Your account has been activated successfully",
       });
-    } else {
-      res.status(500).send({
-        // error: error.message,
-        message: "Email not sent Please try again!!",
-      });
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        throw createError(401, "Token has expired");
+      } else if (error.name === "JsonWebTokenError") {
+        throw createError(401, "Invalid JSON Web Token");
+      } else {
+        throw error;
+      }
     }
   } catch (error) {
-    res.status(500).send({
-      error: error.message,
-      message: "Something error. Please try again!!",
-    });
+    next(error);
   }
 };
 
@@ -310,4 +358,5 @@ module.exports = {
   getUser,
   getUserById,
   deleteUserById,
+  activateUserAccount,
 };
