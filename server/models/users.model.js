@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { isEmail, isStrongPassword } = require("validator");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { defaultImagePath } = require("../secret");
 
 const userSchema = new Schema(
