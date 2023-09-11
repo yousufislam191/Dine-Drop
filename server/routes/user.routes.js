@@ -10,6 +10,7 @@ const {
   activateUserAccount,
 } = require("../controllers/user.controllers");
 const { validationHandler } = require("../middleware");
+const { upload } = require("../middleware/uploadFile");
 const { signUpValidator, signInValidator } = require("../middleware/userAuth");
 
 const userRouter = require("express").Router();
@@ -25,7 +26,7 @@ userRouter.post(
 userRouter.get("/fetch-user", verifyToken, getUser);
 userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
-userRouter.post("/register", createNewUser);
+userRouter.post("/register", upload.single("image"), createNewUser);
 userRouter.post("/verify-account", activateUserAccount);
 userRouter.get("/", getUser);
 userRouter.get("/:id", getUserById);
