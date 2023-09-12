@@ -7,20 +7,22 @@ const signUpValidator = [
   check("name")
     .trim()
     .notEmpty()
-    .withMessage("Name is missing")
+    .withMessage("Name is required")
     .isLength({ min: 3 })
-    .withMessage("Invalid name")
+    .withMessage("Name should be between 3 and 40 characters")
     .isAlpha("en-US", { ignore: " -" })
-    .withMessage("Name should only contain alphabet and space"),
+    .withMessage("Name should only contain alphabet and space")
+    .escape(),
   check("email")
     .trim()
     .normalizeEmail()
     .notEmpty()
-    .withMessage("Email is missing")
+    .withMessage("Email is required")
     .isEmail()
     .withMessage("Invalid email address")
     .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
     .withMessage("Invalid email address")
+    .escape()
     .custom(async (value) => {
       try {
         const existingUser = await User.findOne({ email: value });
@@ -52,19 +54,15 @@ const signUpValidator = [
     .isLength({ min: 11 })
     .withMessage("Phone number must have at least 11 digits")
     .isLength({ max: 11 })
-    .withMessage("Phone number must have at least 11 digits"),
+    .withMessage("Phone number must have at least 11 digits")
+    .escape(),
   check("address")
     .trim()
     .notEmpty()
     .withMessage("Address is missing")
     .isLength({ min: 5 })
     .withMessage("Invalid address"),
-  check("role")
-    .trim()
-    .notEmpty()
-    .withMessage("Role is missing")
-    .matches(/\d/)
-    .withMessage("Role must be digits"),
+  check("image").optional().isString().withMessage("Invalid image"),
 ];
 
 const signInValidator = [

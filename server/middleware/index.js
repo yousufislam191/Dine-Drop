@@ -1,14 +1,20 @@
 const { validationResult } = require("express-validator");
+const { errorResponse } = require("../controllers/response.controller");
 
-exports.validationHandler = (req, res, next) => {
-  const errors = validationResult(req);
-  //   console.log(errors.mapped());
-  const mappedErrors = errors.mapped();
-  if (Object.keys(mappedErrors).length === 0) {
+const validationHandler = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // console.log(errors.mapped());
+      return errorResponse(res, {
+        statusCode: 422,
+        message: errors.mapped(),
+      });
+    }
     next();
-  } else {
-    res.status(400).json({
-      errors: mappedErrors,
-    });
+  } catch (error) {
+    return next(error);
   }
 };
+module.exports = { validationHandler };

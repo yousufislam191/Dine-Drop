@@ -139,7 +139,7 @@ const createNewUser = async (req, res, next) => {
 
     // send activation email
     try {
-      await sendEmailWithNodamailer(emailData);
+      // await sendEmailWithNodamailer(emailData);
     } catch (error) {
       next(createError(500, "Failed to send verification email"));
       return;

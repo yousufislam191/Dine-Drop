@@ -17,16 +17,22 @@ const userRouter = require("express").Router();
 
 // userRouter.post("/register", signUpValidator, validationHandler, createNewUser);
 // userRouter.get("/email-activate", activateCreatedUser);
-userRouter.post(
-  "/signin",
-  signInValidator,
-  validationHandler,
-  userSignInController
-);
-userRouter.get("/fetch-user", verifyToken, getUser);
-userRouter.get("/refresh", refreshToken, verifyToken, getUser);
+// userRouter.post(
+//   "/signin",
+//   signInValidator,
+//   validationHandler,
+//   userSignInController
+// );
+// userRouter.get("/fetch-user", verifyToken, getUser);
+// userRouter.get("/refresh", refreshToken, verifyToken, getUser);
 
-userRouter.post("/register", upload.single("image"), createNewUser);
+userRouter.post(
+  "/register",
+  upload.single("image"),
+  signUpValidator,
+  validationHandler,
+  createNewUser
+);
 userRouter.post("/verify-account", activateUserAccount);
 userRouter.get("/", getUser);
 userRouter.get("/:id", getUserById);
