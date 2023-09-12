@@ -9,4 +9,4 @@ const deleteImage = async (userImagePath) => {
     console.log("user image does not exist");
   }
 };
-// module.exports = { deleteImage };
+module.exports = { deleteImage };

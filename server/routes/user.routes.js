@@ -35,7 +35,7 @@ userRouter.post(
 );
 userRouter.post("/verify-account", activateUserAccount);
 userRouter.get("/", getUser);
-userRouter.get("/:id", getUserById);
-userRouter.delete("/:id", deleteUserById);
+userRouter.get("/:id([0-9a-fA-F]{24})", getUserById);
+userRouter.delete("/:id([0-9a-fA-F]{24})", deleteUserById);
 
 module.exports = userRouter;
